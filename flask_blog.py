@@ -66,7 +66,7 @@ def delete():
 
 
 #CHANGE TO POST AFTER
-@app.route('/display/data')
+@app.route('/display/data', methods=['GET'])
 def data():
     conn = sqlite3.connect('DNA.db')
     cur = conn.cursor()
