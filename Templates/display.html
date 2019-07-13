@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>The dataset is printed below</h1>
+    {% for data_set in all_dataset %}
+        <p style="font-size:30px">{{data_set}}</p>
+    {% endfor %}
+    <div class="container"></div>
+    <script src="{{ url_for('static', filename='jquery.js') }}" type="text/javascript"></script>
+	<script type="text/javascript">
+		//Change to post after
+    	$.get('/display/data', function(data) {
+    		var html = ''
+    		$.each(data.results, function(index, el) {
+    			for(var i = 0; i < el.length; i++){
+    				html += el[i] + ', '
+    			}
+    			$('.container .container').append('<h2>' + html + '</h2>')
+    			html = ''
+    		});
+    	}, 'json');
+    	/*$('.form-inline').on('submit', function(event) {
+    		event.preventDefault();	
+    		$.get('/display/data', {'name':'name'})
+    	});*/
+    </script>
+{% endblock %}

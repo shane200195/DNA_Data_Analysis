@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-section">
+        {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+                <h1>{{ messages[0][1] }}</h1>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Enter the Data you want to delete</legend>
+                <div class="form-group">
+                    {{ form.Disease.label(class='form-control-label') }}
+                    {{ form.Disease(class='form-control form-control-lg') }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class='btn btn-outline-info') }}
+            </div>
+        </form>
+    </div>
+{% endblock %}

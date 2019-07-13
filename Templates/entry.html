@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="content-section">
+        {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+                <h1>{{ messages[0][1] }}</h1>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Enter the Data</legend>
+                <div class="form-group">
+                    {{ form.DNA.label(class='form-control-label', id='DNA') }}
+                    {{ form.DNA(class='form-control form-control-lg') }}
+                </div>
+                <div class="form-group">
+                    {{ form.Disease.label(class='form-control-label') }}
+                    {{ form.Disease(class='form-control form-control-lg') }}
+                </div>
+                <div class="form-group">
+                    {{ form.Description.label(class='form-control-label') }}
+                    {{ form.Description(class='form-control form-control-lg') }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class='btn btn-outline-info') }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}
