@@ -17,16 +17,21 @@ app.config['SECRET_KEY'] = 's200195'
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/entry", methods=['GET', 'POST'])
 def entry():
+    #connecting to the databse
     conn = sqlite3.connect('DNA.db')
     cur = conn.cursor()
     form = DNAEntry()
+
+    #checking if the form was submitted
     if form.validate_on_submit():
+
         #checking if the DNA is already in the database
         cur.execute('SELECT * FROM DNA WHERE DNA=:DNA', {'DNA':form.DNA.data})
         if len(cur.fetchall()) > 0:
             flash(f'The DNA is already in the database, please recheck')
             return redirect(url_for('entry'))
         else:
+            #inserting the new dataset into the DNA database
             with conn:
                 cur.execute('INSERT INTO DNA VALUES(:DNA, :Disease, :Description)',
                             {'DNA':form.DNA.data, 'Disease':form.Disease.data,
@@ -40,51 +45,59 @@ def entry():
 #deleting data from the database
 @app.route('/delete', methods={'GET', 'POST'})
 def delete():
+    #connecting to the database
     conn = sqlite3.connect('DNA.db')
     cur = conn.cursor()
+
+    #initializing the form on the page
     form = DNADelete()
-    #deleting the specific disease from the database of DNA
+
+    #checking if the form is submitted
     if form.validate_on_submit():
+
+        #deleting the disease form the database
         cur.execute('DELETE FROM DNA WHERE Disease=:Disease',
                     {'Disease':form.Disease.data})
         conn.commit()
         flash(f'Deleted the specific dataset')
+
+        #redirecting to a fresh version of the delete page
         return redirect(url_for('delete'))
 
     return render_template('delete.html', form=form)
 
-#TEMPORARILY DELETED
-# #displaying data from the database 
-# @app.route('/display', methods={'GET', 'POST'})
-# def analyze():
-#     conn = sqlite3.connect('DNA.db')
-#     cur = conn.cursor()
-#     selecting_all = cur.execute('SELECT * FROM DNA')
-#     all_dataset = cur.fetchall()
-#     return render_template('display.html', all_dataset=all_dataset)
-#UNCOMMENT EVERYTHING ABOVE
-
-
-#CHANGE TO POST AFTER
-@app.route('/display/data', methods=['GET'])
-def data():
-    conn = sqlite3.connect('DNA.db')
-    cur = conn.cursor()
-    selecting_all = cur.execute('SELECT * FROM DNA')
-    all_dataset = cur.fetchall()
-    #test = request.form['name']
-    return jsonify({'results': all_dataset})
-
-@app.route('/display')
+#displaying data from the database 
+@app.route('/display', methods={'GET', 'POST'})
 def analyze():
     return render_template('display.html')
+
+#sending data to client
+@app.route('/display/data', methods=['POST'])
+def data():
+    #connecting to the database
+    conn = sqlite3.connect('DNA.db')
+    cur = conn.cursor()
+
+    #creating the form for g
+    disease = request.form['disease']
+    if disease:
+        DNA = cur.execute('SELECT * FROM DNA WHERE Disease=:Disease', {'Disease':disease})
+        output = cur.fetchall()[0]
+        conn.commit()
+        print(output)
+        return jsonify({'disease':output[1], 'DNA':output[0], 'description':output[2]})
+
+    return jsonify({'disease': 'error'})
 
 #updating the database
 @app.route('/update', methods=['GET', 'POST'])
 def update():
+    #connecting to the database
     conn = sqlite3.connect('DNA.db')
     cur = conn.cursor()
     form = DNAUpdate()
+
+    #checking if the form is submitted
     if form.validate_on_submit():
 
         #checking which information needs updating
@@ -93,18 +106,24 @@ def update():
 
         #updating the appropriate elements of the database
         if DNA_len == 0  and Description_len > 0:
+
+            #updating only the description
             cur.execute('UPDATE DNA SET Description=:Description WHERE '
                         'Disease=:Disease',
                         {'Description':form.Description.data,
                          'Disease':form.Disease.data})
             conn.commit()
         elif DNA_len > 0 and Description_len == 0:
+
+            #updating only the DNA
             cur.execute('UPDATE DNA SET DNA=:DNA WHERE '
                         'Disease=:Disease',
                         {'DNA': form.DNA.data,
                          'Disease': form.Disease.data})
             conn.commit()
         else:
+
+            #updating both
             cur.execute('UPDATE DNA SET DNA=:DNA, Description=:Description '
                         'WHERE '
                         'Disease=:Disease',
