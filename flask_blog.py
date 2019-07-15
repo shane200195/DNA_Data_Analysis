@@ -2,6 +2,7 @@ from flask import Flask,render_template, url_for, flash, redirect, jsonify, requ
 from forms import DNAEntry, DNADelete, DNAUpdate
 import sqlite3
 import ctypes
+from gene import DNA
 from random import sample
 
 #webapp
@@ -81,11 +82,16 @@ def data():
     #creating the form for g
     disease = request.form['disease']
     if disease:
-        DNA = cur.execute('SELECT * FROM DNA WHERE Disease=:Disease', {'Disease':disease})
+
+        #obtainng the DNA data
+        cur.execute('SELECT * FROM DNA WHERE Disease=:Disease', {'Disease':disease})
         output = cur.fetchall()[0]
+        dna = DNA(output[0])
+
+        #creating a DNA class object
         conn.commit()
-        print(output)
-        return jsonify({'disease':output[1], 'DNA':output[0], 'description':output[2]})
+        print(dna.count())
+        return jsonify({'DNA':dna.gene, 'DNA_Count':dna.count()})
 
     return jsonify({'disease': 'error'})
 
