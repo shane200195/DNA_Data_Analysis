@@ -91,7 +91,7 @@ def data():
         #creating a DNA class object
         conn.commit()
         print(dna.count())
-        return jsonify({'DNA':dna.gene, 'DNA_Count':dna.count()})
+        return jsonify({'DNA':dna.gene, 'DNA_Count':dna.count(), 'DNA_motif_combo': dna.frequency_map_k(5)})
 
     return jsonify({'disease': 'error'})
 
